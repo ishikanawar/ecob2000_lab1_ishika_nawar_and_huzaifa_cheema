@@ -1,0 +1,65 @@
+---
+title: "ecob2000_lab1_ishika_and_huzaifa"
+format: html
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
+
+```{r}
+how_many_rolls <- 40
+sim_rolls <- sample(1:6, how_many_rolls, replace = TRUE)
+```
+
+```{r}
+sim_rolls
+```
+
+```{r}
+summary(sim_rolls)
+```
+
+```{r}
+prop.table(table(sim_rolls))
+```
+
+```{r}
+freq_six <- table(sim_rolls)["6"]
+freq_six
+```
+
+```{r}
+t.stat <- (3.25 - 3.5)/(1.660244035/sqrt(40))
+p.value <- 2 * pt(-abs(t.stat), df=39)
+
+p.value
+```
+
+```{r}
+t.stat
+```
+
+```{r}
+binom.test(x= 5, n = 40, p = 1/6)
+```
+
+x
