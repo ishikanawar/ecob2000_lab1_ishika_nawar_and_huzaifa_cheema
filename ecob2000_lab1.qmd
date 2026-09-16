@@ -62,4 +62,65 @@ t.stat
 binom.test(x= 5, n = 40, p = 1/6)
 ```
 
-x
+```{r}
+# ---- Setup ----
+n <- 100
+p <- 1/6
+
+# ---- Step 1: Mean and SD of the null distribution ----
+mu <- n * p
+sigma <- sqrt(n * p * (1 - p))
+cat("Mean:", mu, " SD:", sigma, "\n")
+
+# ---- Step 2: Normal approximation cutoffs (z = 1.96 for alpha = 0.05, two-tailed) ----
+z <- qnorm(0.975)  # 1.96
+lower_approx <- mu - z * sigma
+upper_approx <- mu + z * sigma
+cat("Normal approx cutoffs:", lower_approx, upper_approx, "\n")
+
+# ---- Step 3: Exact binomial tail probabilities for candidate cutoffs ----
+# P(X <= k) for a few candidate lower cutoffs
+for (k in 8:11) {
+  cat("P(X <=", k, ") =", pbinom(k, n, p), "\n")
+}
+
+# P(X >= k) for a few candidate upper cutoffs
+for (k in 23:26) {
+  cat("P(X >=", k, ") =", 1 - pbinom(k - 1, n, p), "\n")
+}
+
+# ---- Step 4: Actual Type I error rate for chosen rejection region (X<=9 or X>=25) ----
+alpha_actual <- pbinom(9, n, p) + (1 - pbinom(24, n, p))
+cat("Actual alpha for cutoffs (9, 25):", alpha_actual, "\n")
+
+# ---- Step 5: Check the original 15-25 boundary (shows why it's miscalibrated) ----
+alpha_original <- 1 - (pbinom(25, n, p) - pbinom(14, n, p))
+cat("Actual alpha for cutoffs (15, 25):", alpha_original, "\n")
+
+# ---- Step 6: Power calculations for various true biases ----
+# Using the calibrated rejection region: reject if X<=9 or X>=25
+p_alt <- c(0.20, 0.22, 0.25, 0.30)
+power <- sapply(p_alt, function(pa) {
+  pbinom(9, n, pa) + (1 - pbinom(24, n, pa))
+})
+data.frame(true_p = p_alt, power = power)
+```
+
+```{r}
+n <- 100      # number of rolls
+p <- 1/6      # null hypothesis: probability of rolling a 6 on a fair die
+
+# Rejection region: reject H0 (call the die unfair) if X <= 9 or X >= 25
+
+# Lower tail: P(X <= 9)
+lower_tail <- pbinom(9, size = n, prob = p)
+cat("P(X <= 9)  =", lower_tail, "\n")
+
+# Upper tail: P(X >= 25)  =  1 - P(X <= 24)
+upper_tail <- 1 - pbinom(24, size = n, prob = p)
+cat("P(X >= 25) =", upper_tail, "\n")
+
+# Type I error rate = sum of both tails (mutually exclusive events)
+alpha_actual <- lower_tail + upper_tail
+cat("Actual Type I error rate =", alpha_actual, "\n")
+```
